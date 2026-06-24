@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#16181d" />
+  <title>MusicMaker — Virtual AKAI MPK mini Play MK3</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">●</span>
+      <div>
+        <h1>MusicMaker</h1>
+        <p>Virtual AKAI Professional MPK mini Play MK3 · MIDI · Loop Machine</p>
+      </div>
+    </div>
+    <div class="midi-bar">
+      <span id="midiStatus" class="pill">Web MIDI: …</span>
+      <label>In <select id="midiIn"><option value="all">All inputs</option></select></label>
+      <label>Out <select id="midiOut"><option value="">None</option></select></label>
+      <label class="chk"><input type="checkbox" id="thruChk" /> MIDI Thru</label>
+    </div>
+  </header>
+
+  <nav class="tabs-bar">
+    <button class="tab active" data-tab="instrument">🎹 Instrument</button>
+    <button class="tab" data-tab="sequencer">🎼 Sequencer</button>
+  </nav>
+
+  <main>
+   <div class="tab-panel active" data-panel="instrument">
+    <!-- The device -->
+    <section class="device">
+      <div class="program-bar">
+        <span class="prog-caption">SOUND</span>
+        <button id="instPrev" class="prog-arrow" title="Previous sound">◀</button>
+        <div class="prog-display"><span id="instName">Grand Piano</span></div>
+        <button id="instNext" class="prog-arrow" title="Next sound">▶</button>
+        <select id="instrument" class="prog-select" title="Choose instrument"></select>
+      </div>
+
+      <div class="device-top">
+        <div class="pads-section">
+          <div class="section-label">PADS</div>
+          <div id="pads" class="pads"></div>
+        </div>
+        <div class="knobs-section">
+          <div class="section-label">KNOBS</div>
+          <div id="knobs" class="knobs"></div>
+        </div>
+      </div>
+
+      <div class="key-controls">
+        <button id="octDown" class="ctrl-btn">◀ Oct</button>
+        <span class="oct-readout">Octave <b id="octaveLabel">0</b></span>
+        <button id="octUp" class="ctrl-btn">Oct ▶</button>
+        <button id="sustainBtn" class="ctrl-btn">Sustain</button>
+        <button id="panicBtn" class="ctrl-btn">Panic ⏹</button>
+      </div>
+
+      <div id="keys" class="keys"></div>
+    </section>
+
+    <!-- Loop machine -->
+    <section class="loopstation">
+      <div class="transport">
+        <button id="playBtn" class="big">▶ Play</button>
+        <button id="recBtn" class="big rec">● Rec</button>
+        <button id="metroBtn" class="big">Metronome</button>
+        <button id="addTrackBtn" class="big">+ Track</button>
+        <div class="spacer"></div>
+        <label>BPM <input id="bpm" type="number" value="120" min="40" max="300" /></label>
+        <label>Bars <input id="bars" type="number" value="4" min="1" max="32" /></label>
+        <label>Quantize
+          <select id="quantize">
+            <option value="0">Off</option>
+            <option value="1">1/4</option>
+            <option value="0.5">1/8</option>
+            <option value="0.25">1/16</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="timeline">
+        <div id="playhead" class="playhead"></div>
+      </div>
+
+      <div class="tracks-and-io">
+        <div id="trackList" class="track-list"></div>
+        <div class="io">
+          <button id="exportBtn" class="io-btn">⬇ Export MIDI</button>
+          <label class="io-btn import">⬆ Import MIDI
+            <input id="importFile" type="file" accept=".mid,.midi,audio/midi" hidden />
+          </label>
+        </div>
+      </div>
+    </section>
+   </div><!-- /instrument panel -->
+
+   <!-- Sequencer (piano roll) -->
+   <div class="tab-panel" data-panel="sequencer">
+    <section class="sequencer">
+      <div class="transport seq-transport">
+        <button id="seqPlay" class="big">▶ Play</button>
+        <button id="seqClear" class="big">Clear</button>
+        <button id="seqExport" class="big">⬇ Export MIDI</button>
+        <label class="inst-select">Sound <select id="seqInstrument"></select></label>
+        <div class="spacer"></div>
+        <label>BPM <input id="seqBpm" type="number" value="120" min="40" max="300" /></label>
+        <label>Bars <input id="seqBars" type="number" value="2" min="1" max="8" /></label>
+        <label>Grid
+          <select id="seqRes">
+            <option value="1">1/4</option>
+            <option value="2">1/8</option>
+            <option value="4" selected>1/16</option>
+          </select>
+        </label>
+        <span id="seqInfo" class="seq-info">0 notes</span>
+      </div>
+
+      <div class="seq-hint">Click an empty cell to add a note · drag its right edge to lengthen · click a note to delete. Toggle drum steps below.</div>
+
+      <div id="seqRollBody" class="roll-body"></div>
+
+      <div class="drum-section">
+        <div class="section-label">DRUM STEPS</div>
+        <div id="seqDrums" class="drum-grid-wrap"></div>
+      </div>
+    </section>
+   </div><!-- /sequencer panel -->
+
+    <section class="help">
+      <details>
+        <summary>How to use & keyboard shortcuts</summary>
+        <ul>
+          <li><b>Play notes:</b> on-screen keys, your computer keyboard, or a connected MIDI keyboard. The computer-key mapping follows <em>physical key positions</em>, so it works the same on US-QWERTY and German-QWERTZ keyboards. White keys: A S D F G H J K L ; — black keys: W E T Y U O P.</li>
+          <li><b>Pads (drums):</b> click pads or press number keys <b>1–8</b> (top row or numpad). MIDI drum channel 10 maps to pads.</li>
+          <li><b>Sounds:</b> pick an instrument from the <b>Sound</b> menu — Grand Piano (default), Electric Piano, Organ, Accordion, Harmonica, Strings, Synth Lead.</li>
+          <li><b>Knobs:</b> drag up/down or scroll. They drive the synth (and respond to MIDI CC 70-93). Vibrato = mod wheel (CC 1).</li>
+          <li><b>Sequencer tab:</b> a mini piano roll — click cells to draw notes, drag a note's right edge to make it longer, click a note to remove it, and toggle the drum-step grid. Press Play to loop; Export MIDI to save.</li>
+          <li><b>Octave:</b> the two bottom-left keys (Z / X on QWERTY, Y / X on QWERTZ) or the ◀/▶ Oct buttons.</li>
+          <li><b>Loop machine:</b> Space = Play/Stop, R = Record. Arm Record then play — your performance loops. Add tracks to layer.</li>
+          <li><b>MIDI:</b> connect a device (USB or Bluetooth). On phones use Chrome (Android) or a Web MIDI browser. Pick an Output + enable MIDI Thru to drive external gear.</li>
+        </ul>
+      </details>
+      <pre id="log" class="log"></pre>
+    </section>
+  </main>
+
+  <script src="midifile.js"></script>
+  <script src="audio.js"></script>
+  <script src="sequencer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
