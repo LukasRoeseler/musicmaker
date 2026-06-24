@@ -49,6 +49,8 @@
       seq.notes = []; resetDrums(); renderNotes(); renderDrums();
     });
     $('seqExport').addEventListener('click', exportMidi);
+    $('seqRandom').addEventListener('click', randomizeDrums);
+    $('seqToLoop').addEventListener('click', sendToLoop);
 
     const bpmEl = $('seqBpm'); bpmEl.value = seq.bpm;
     bpmEl.addEventListener('change', (e) => { seq.bpm = Math.max(40, Math.min(300, +e.target.value || 120)); });
@@ -282,6 +284,64 @@
     let c = 0; seq.drums.forEach((r) => r.forEach((v) => { if (v) c++; })); return c;
   }
 
+  // ---------------- Randomize ----------------
+  function randomizeDrums() {
+    window.MM.engine.ensure();
+    resetDrums();
+    const sp = seq.stepsPerBeat;
+    const total = steps();
+    const half = Math.max(1, Math.floor(sp / 2));
+    for (let s = 0; s < total; s++) {
+      const beat = Math.floor(s / sp);
+      const inBeat = s % sp;
+      const downbeat = inBeat === 0;
+      const backbeat = downbeat && (beat % 2 === 1);   // beats 2 & 4
+      // Kick — strong on even downbeats, light syncopation elsewhere
+      if (downbeat && beat % 2 === 0) { if (Math.random() < 0.92) seq.drums[0][s] = true; }
+      else if (Math.random() < 0.12) seq.drums[0][s] = true;
+      // Snare — backbeats
+      if (backbeat) { if (Math.random() < 0.9) seq.drums[1][s] = true; }
+      else if (downbeat && Math.random() < 0.05) seq.drums[1][s] = true;
+      // Closed hat — steady 8ths with occasional extras
+      if (s % half === 0) { if (Math.random() < 0.8) seq.drums[2][s] = true; }
+      else if (Math.random() < 0.22) seq.drums[2][s] = true;
+      // Open hat — offbeat colour
+      if (inBeat === half && Math.random() < 0.18) seq.drums[3][s] = true;
+      // Clap — reinforce some backbeats
+      if (backbeat && Math.random() < 0.3) seq.drums[4][s] = true;
+    }
+    // Crash on the very first beat
+    if (Math.random() < 0.6) seq.drums[7][0] = true;
+    // Tom fill across the final beat
+    if (Math.random() < 0.45) {
+      const start = total - sp;
+      for (let i = 0; i < sp; i++) if (Math.random() < 0.5) seq.drums[5 + (i % 2)][start + i] = true;
+    }
+    renderDrums();
+    window.MM.log('Randomized drum pattern.');
+  }
+
+  // ---------------- Send to Loop Machine ----------------
+  function sendToLoop() {
+    const sps = secPerStep();
+    window.MM.setLoopTempo(seq.bpm, seq.bars);  // match loop tempo/length to the sequence
+    let added = 0;
+    if (seq.notes.length) {
+      const mel = [];
+      seq.notes.forEach((n) => {
+        mel.push({ time: n.start * sps, type: 'noteOn', note: n.pitch, velocity: seq.velocity });
+        mel.push({ time: (n.start + n.len) * sps, type: 'noteOff', note: n.pitch, velocity: 0 });
+      });
+      window.MM.addLoopTrack('Seq notes', mel, window.MM.engine.instrument);
+      added++;
+    }
+    const dr = [];
+    for (let p = 0; p < 8; p++) for (let s = 0; s < steps(); s++) if (seq.drums[p][s]) dr.push({ time: s * sps, type: 'drum', padIndex: p, velocity: 115 });
+    if (dr.length) { window.MM.addLoopTrack('Seq drums', dr, window.MM.engine.instrument); added++; }
+    if (!added) { window.MM.log('Nothing to send — draw notes or drums first.'); return; }
+    window.MM.log('Sent sequence to the Loop Machine (' + added + ' track' + (added > 1 ? 's' : '') + ').');
+  }
+
   // ---------------- Playback ----------------
   function buildEvents() {
     const sps = secPerStep();
@@ -353,6 +413,7 @@
     const tpb = 480;
     const tickPerStep = tpb / seq.stepsPerBeat;
     const noteTrack = { name: 'Sequence', events: [] };
+    noteTrack.events.push({ tick: 0, type: 'program', program: window.MM.gmProgram(window.MM.engine.instrument), channel: 0 });
     seq.notes.forEach((n) => {
       noteTrack.events.push({ tick: Math.round(n.start * tickPerStep), type: 'noteOn', note: n.pitch, velocity: seq.velocity, channel: 0 });
       noteTrack.events.push({ tick: Math.round((n.start + n.len) * tickPerStep), type: 'noteOff', note: n.pitch, velocity: 0, channel: 0 });

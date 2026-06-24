@@ -1,9 +1,9 @@
-# MusicMaker — Virtual AKAI MPK mini Play MK3
+# MIDI Maker and Loop Machine
 
-A browser-based recreation of the **AKAI Professional MPK mini Play MK3**: a 25-key
-synth keyboard, 8 drum pads, and 8 assignable knobs — plus a **loop machine**,
-**MIDI file import/export**, and full **Web MIDI** support so it works with real
-MIDI hardware on desktop and on phones.
+A browser-based MIDI workstation: a 25-key synth keyboard, 8 drum pads, and 8
+assignable knobs — plus a **loop machine**, a **piano-roll sequencer**, an
+**arpeggiator**, **MIDI file import/export**, and full **Web MIDI** support so it
+works with real MIDI hardware on desktop and on phones.
 
 No build step, no dependencies — just static files.
 
@@ -11,11 +11,15 @@ No build step, no dependencies — just static files.
 
 - **Two tabs:** **🎹 Instrument** (the live controller + loop machine) and **🎼 Sequencer** (a piano-roll "DAW lite" for writing music).
 - **25-key keyboard** — play with mouse/touch, your computer keyboard, or a MIDI device.
-- **Instrument sounds** — choose from **Grand Piano** (default, additive-synthesis piano with hammer attack and inharmonic partials), Electric Piano, Organ, Accordion, Harmonica, Strings, and Synth Lead.
-- **8 drum pads** — synthesized kick, snare, hats, clap, toms, crash. Trigger with keys `1`–`8` or MIDI channel 10.
+- **15 instrument sounds** — pianos (additive synthesis with hammer attack + inharmonic partials), Electric Piano, Organ, Accordion, Harmonica, Strings, Synth Lead; **guitars** via Karplus-Strong physical modelling (Acoustic, Electric, Rock w/ distortion, Post-Rock w/ tremolo); and **sci-fi / math-rock** synths (Sci-Fi Pad, Hyperspace Lead, Warp Bass, Crystal Bells).
+- **8 drum pads with switchable kits** — Real Drums (default, layered/realistic), Acoustic, 808, 909, Lo-Fi. Trigger with keys `1`–`8` or MIDI channel 10.
+- **Arpeggiator / note-repeat** — independent for keys and pads, with Up / Down / Up-Down / Random / As-Played / Chord (pads: + All) modes, tempo-synced rate. Recordable into the loop machine.
+- **Loop machine on top** — always visible above the Instrument/Sequencer tabs; records keys, pads, MIDI and arpeggios. **⤴ Send to Loop** copies a sequence in as tracks.
+- **Dry by default** — reverb and delay start at 0 and are never applied to drums.
+- **Themes** — Dark, Light, Retro, Futuristic (remembered via localStorage).
 - **8 knobs** — filter cutoff/resonance, attack/release, reverb, delay, vibrato (mod wheel), volume. Drag, scroll, or send MIDI CC (1, 7, 70–93).
 - **Loop machine** — multi-track recorder with tempo, bars, metronome, quantize, mute, and a moving playhead. Layer tracks to build a groove.
-- **Sequencer (piano roll)** — click to draw notes, drag a note's right edge to lengthen, click a note to delete; a separate 8-pad drum-step grid; selectable bars and grid resolution (1/4–1/16); play/loop with a moving playhead; export the sequence to MIDI.
+- **Sequencer (piano roll)** — click to draw notes, drag a note's right edge to lengthen, click a note to delete; a separate 8-pad drum-step grid with a **🎲 Randomize** button; selectable bars and grid resolution (1/4–1/16); play/loop with a moving playhead; export the sequence to MIDI.
 - **MIDI import** — load a `.mid` file; notes go to a melodic track, drum channel maps to the pads.
 - **MIDI export** — save your loop as a Standard MIDI File.
 - **Web MIDI I/O** — pick an input and output; enable **MIDI Thru** to drive external gear.

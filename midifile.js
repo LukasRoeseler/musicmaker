@@ -209,6 +209,8 @@
           body.push(...writeVarint(delta), 0x80 | ch, ev.note & 0x7f, (ev.velocity || 0) & 0x7f);
         } else if (ev.type === 'cc') {
           body.push(...writeVarint(delta), 0xb0 | ch, ev.controller & 0x7f, ev.value & 0x7f);
+        } else if (ev.type === 'program') {
+          body.push(...writeVarint(delta), 0xc0 | ch, ev.program & 0x7f);
         }
       });
       body.push(...writeVarint(0), 0xff, 0x2f, 0x00);
